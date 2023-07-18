@@ -1,0 +1,64 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace _174_182_QLCHLAPTOP
+{
+    public partial class frmThongKeHoaDonBan : Form
+    {
+        public frmThongKeHoaDonBan()
+        {
+            InitializeComponent();
+        }
+
+        clsCuaHangLapTop c = new clsCuaHangLapTop();
+
+        void LoadDuLieu_datagrid(DataGridView d, string sql)
+        {
+            DataSet ds = c.LayDuLieu(sql);
+            d.DataSource = ds.Tables[0];
+        }
+        private void txtTuTim_TextChanged(object sender, EventArgs e)
+        {
+
+            if (cboCachTK.Text == "Tổng Tiền Hóa Đơn Khách Hàng Mua")
+            {
+                LoadDuLieu_datagrid(dgvHoaDonTK, "SELECT K.MAKH 'Mã Khách Hàng', TENKH 'Tên Khách Hàng' , MAHDB 'Mã Hóa Đơn Bán', TONGTIEN 'Tổng Tiền' FROM KHACHHANG k, HOADONBAN h WHERE K.MAKH = h.MAKH AND k.MAKH Like N'%" + txtTuTK.Text + "%'");
+            }
+            if (cboCachTK.Text == "Sản Phẩm Khách Hàng Mua")
+            {
+                LoadDuLieu_datagrid(dgvHoaDonTK, "SELECT C.MASP 'Mã Sản Phẩm', S.TENSP 'Tên Sản Phẩm', SOLUONG 'Số Lượng', THANHTIEN 'Thành Tiền' FROM CHITIETHOADONBAN C, HOADONBAN H, SANPHAM S WHERE C.MAHDB = H.MAHDB AND S.MASP = C.MASP AND h.MAKH Like N'%" + txtTuTK.Text + "%'");
+            }
+            if (cboCachTK.Text == "Tổng Tiền Khách Hàng Mua")
+            {
+                LoadDuLieu_datagrid(dgvHoaDonTK, "SELECT SUM(TONGTIEN) 'TỔNG TIỀN' FROM KHACHHANG k, HOADONBAN h WHERE K.MAKH = h.MAKH AND k.MAKH Like N'%" + txtTuTK.Text + "%'");
+            }
+        }
+
+        private void btnThongKe_Click(object sender, EventArgs e)
+        {
+            if (txtTuTK.Text == "")
+            {
+                MessageBox.Show("Bạn chưa nhập thông tin cần tìm", "Thông báo");
+            }
+            txtTuTim_TextChanged(sender, e);
+        }
+        void loadhoadontheongay()
+        {
+            DataSet getngaylap = c.LayDuLieu("select sum(CHITIETHOADONBAN.SOLUONG) as SOLUONG from SANPHAM, HOADONBAN, CHITIETHOADONBAN where SANPHAM.MASP = CHITIETHOADONBAN.MASP and HOADONBAN.MAHDB = CHITIETHOADONBAN.MAHDB and SANPHAM.MASP = @masp and month(HOADONBAN.NGAYLAP) = @thang and Year(HOADONBAN.NGAYLAP) = @nam + ");
+
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+
+            LoadDuLieu_datagrid(dgvHoaDonTK, "select * from HOADONBAN ");
+        }
+    }
+}
